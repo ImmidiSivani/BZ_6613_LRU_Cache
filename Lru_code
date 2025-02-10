@@ -1,0 +1,204 @@
+class LRUCache {
+
+CDLL ll;
+
+int capacity;
+
+int size;
+
+Map<Integer, CDLLNode> mp;
+
+public LRUCache(int cap){
+
+ll = new CDLL();
+
+this.capacity = cap;
+
+this.size = 0;
+
+mp = new HashMap<>();
+
+}
+
+int get(int k){
+
+if(mp.containsKey(k)){
+
+CDLLNode node = mp.get(k);
+
+ll.moveToFront(node);
+
+return node.val;
+
+} else {
+
+return -1;
+
+}
+
+}
+
+void put(int k, int v){
+
+if(mp.containsKey(k)){ // update
+
+CDLLNode node = mp.get(k);
+
+node.val = v;
+
+ll.moveToFront(node);
+
+} else { // insert
+
+if(size < capacity){
+
+CDLLNode nn = ll.insAtBegin(k, v);
+
+mp.put(k, nn);
+
+size++;
+
+} else { // evict LRU
+
+int delKey = ll.delLast();
+
+mp.remove(delKey);
+
+CDLLNode nn = ll.insAtBegin(k, v);
+
+mp.put(k, nn);
+
+}
+
+}
+
+}
+
+}
+
+ 
+
+ 
+
+class CDLLNode {
+
+int key, val;
+
+CDLLNode prev, next;
+
+public CDLLNode(int k, int v){
+
+this.key = k;
+
+this.val = v;
+
+this.prev = this.next = null;
+
+}
+
+}
+
+class CDLL {
+
+CDLLNode head;
+
+public CDLL(){
+
+head = null;
+
+}
+
+CDLLNode insAtBegin(int k, int v){
+
+CDLLNode nn = new CDLLNode(k, v);
+
+nn.next = nn; nn.prev = nn;
+
+if(head == null) {head = nn; return nn;}
+
+CDLLNode last = head.prev;
+
+nn.next = head; head.prev = nn;
+
+last.next = nn; nn.prev = last;
+
+head = nn; return nn;
+
+}
+
+void printLL(){
+
+if(head == null) return;
+
+System.out.print(head.key + " ");
+
+CDLLNode curr = head.next;
+
+while(curr != head){
+
+System.out.print(curr.key + " ");
+
+curr = curr.next;
+
+}
+
+System.out.println();
+
+}
+
+ 
+
+int delLast(){
+
+if(head == null) return -1;
+
+CDLLNode last = head.prev;
+
+int ret = last.key;
+
+if(last == head) { head = null; return ret;}
+
+last.prev.next = head;
+
+head.prev = last.prev;
+
+return ret;
+
+}
+
+ 
+
+void moveToFront(CDLLNode nodeToMove){
+
+if(nodeToMove == head) return; // nothing to do
+
+nodeToMove.prev.next = nodeToMove.next;
+
+nodeToMove.next.prev = nodeToMove.prev;
+
+CDLLNode last = head.prev;
+
+nodeToMove.next = head; head.prev = nodeToMove;
+
+last.next = nodeToMove; nodeToMove.prev = last;
+
+head = nodeToMove;
+
+}
+
+}
+
+ 
+
+/**
+
+ * Your LRUCache object will be instantiated and called as such:
+
+ * LRUCache obj = new LRUCache(capacity);
+
+ * int param_1 = obj.get(key);
+
+ * obj.put(key,value);
+
+ */
+
